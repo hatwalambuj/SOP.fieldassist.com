@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flickpoint Agent — HLD · FieldAssist</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --navy:   #1F4E79;
+  --blue:   #2E75B6;
+  --lblue:  #D6E4F0;
+  --orange: #E05C1A;
+  --lorange:#FFF0E6;
+  --green:  #16A34A;
+  --lgreen: #DCFCE7;
+  --purple: #7C3AED;
+  --lpurple:#EDE9FE;
+  --amber:  #D97706;
+  --lamber: #FEF3C7;
+  --slate:  #475569;
+  --muted:  #94A3B8;
+  --bg:     #F8FAFC;
+  --card:   #FFFFFF;
+  --border: #E2E8F0;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: #1E293B;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── LAYOUT ────────────────────────────────────── */
+.layout { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ───────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--navy);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo .brand { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+.sidebar-logo .sub   { font-size: 11px; color: #7FB3D3; margin-top: 2px; }
+.sidebar-logo .badge {
+  display: inline-block; margin-top: 8px; padding: 3px 8px;
+  background: rgba(255,255,255,0.1); border-radius: 20px;
+  font-size: 10px; color: #BDD7EE; font-weight: 500;
+}
+.nav { padding: 16px 0; flex: 1; }
+.nav-label { padding: 6px 20px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 1px; text-transform: uppercase; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; font-size: 12.5px; font-weight: 500;
+  color: rgba(255,255,255,0.65); text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.nav a:hover, .nav a.active {
+  color: #fff; background: rgba(255,255,255,0.07);
+  border-left-color: #4DA3E0;
+}
+.nav a .icon { font-size: 14px; width: 18px; text-align: center; }
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.35); }
+
+/* ── MAIN ──────────────────────────────────────── */
+.main { margin-left: 220px; flex: 1; }
+
+/* ── HERO ──────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #2563A8 100%);
+  padding: 52px 52px 44px;
+  position: relative; overflow: hidden;
+}
+.hero::after {
+  content: ''; position: absolute;
+  right: -60px; top: -60px;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.12); border-radius: 20px;
+  padding: 4px 12px; font-size: 11px; font-weight: 600;
+  color: #BDD7EE; letter-spacing: 0.3px; margin-bottom: 18px;
+}
+.hero h1 { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.15; }
+.hero h1 span { color: #60AFEC; }
+.hero p { margin-top: 10px; font-size: 14px; color: #93C5E8; max-width: 560px; line-height: 1.65; }
+.hero-meta { display: flex; gap: 24px; margin-top: 28px; flex-wrap: wrap; }
+.hero-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.hero-meta-item .label { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+.hero-meta-item .value { font-size: 13px; color: #fff; font-weight: 600; }
+.hero-stats { display: flex; gap: 16px; margin-top: 28px; flex-wrap: wrap; }
+.stat-pill {
+  background: rgba(255,255,255,0.1); border-radius: 10px;
+  padding: 10px 18px; display: flex; align-items: center; gap: 10px;
+}
+.stat-pill .n { font-size: 22px; font-weight: 800; color: #fff; }
+.stat-pill .l { font-size: 11px; color: #93C5E8; }
+
+/* ── SECTION ───────────────────────────────────── */
+section { padding: 48px 52px; border-bottom: 1px solid var(--border); }
+section:last-child { border-bottom: none; }
+.section-header { margin-bottom: 28px; }
+.section-tag {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  background: var(--lblue); color: var(--navy); margin-bottom: 8px;
+}
+.section-tag.orange { background: var(--lorange); color: var(--orange); }
+.section-tag.green  { background: var(--lgreen);  color: var(--green);  }
+.section-tag.purple { background: var(--lpurple); color: var(--purple); }
+.section-tag.amber  { background: var(--lamber);  color: var(--amber);  }
+h2 { font-size: 22px; font-weight: 700; color: var(--navy); }
+h2 .sub { font-size: 14px; font-weight: 400; color: var(--slate); margin-top: 4px; display: block; }
+
+/* ── CARDS ─────────────────────────────────────── */
+.cards { display: grid; gap: 16px; }
+.cards-2 { grid-template-columns: repeat(2, 1fr); }
+.cards-3 { grid-template-columns: repeat(3, 1fr); }
+.cards-4 { grid-template-columns: repeat(4, 1fr); }
+.card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card-icon { font-size: 22px; margin-bottom: 10px; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.card-body  { font-size: 12px; color: var(--slate); line-height: 1.6; }
+
+/* ── PROBLEM ───────────────────────────────────── */
+.problem-compare { display: grid; grid-template-columns: 1fr 48px 1fr; gap: 0; align-items: center; margin-bottom: 32px; }
+.prob-box {
+  border-radius: var(--radius); padding: 24px;
+  border: 1.5px solid var(--border);
+}
+.prob-box.before { background: #FFF5F5; border-color: #FCA5A5; }
+.prob-box.after  { background: #F0FDF4; border-color: #86EFAC; }
+.prob-box h3 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+.prob-box.before h3 { color: #B91C1C; }
+.prob-box.after  h3 { color: #15803D; }
+.prob-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.prob-step .dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-top: 1px; }
+.prob-box.before .dot { background: #FEE2E2; color: #B91C1C; }
+.prob-box.after  .dot { background: #DCFCE7; color: #15803D; }
+.prob-step .txt { font-size: 12px; color: var(--slate); }
+.arrow-mid { display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--blue); }
+
+/* ── ARCH DIAGRAM ──────────────────────────────── */
+.arch-wrap {
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 32px;
+  box-shadow: var(--shadow-lg);
+  overflow-x: auto;
+}
+.arch-diagram { min-width: 860px; }
+
+/* ── STEPPER ───────────────────────────────────── */
+.stepper { display: flex; align-items: flex-start; gap: 0; }
+.step-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute; top: 22px; left: calc(50% + 22px);
+  width: calc(100% - 44px); right: auto; height: 2px;
+  background: linear-gradient(to right, var(--blue), var(--lblue));
+}
+.step-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700;
+  box-shadow: 0 4px 12px rgba(31,78,121,0.3);
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.step-item.highlight .step-circle { background: var(--orange); box-shadow: 0 4px 12px rgba(224,92,26,0.35); }
+.step-body { margin-top: 12px; text-align: center; padding: 0 8px; }
+.step-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.step-item.highlight .step-title { color: var(--orange); }
+.step-desc  { font-size: 11px; color: var(--slate); line-height: 1.5; }
+
+/* ── SIGNALS ───────────────────────────────────── */
+.signal-grid {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+}
+.signal-card {
+  flex: 0 0 calc(25% - 9px); min-width: 180px;
+  background: var(--card); border-radius: 10px;
+  border: 1.5px solid var(--border); padding: 16px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: var(--shadow); transition: transform 0.15s, box-shadow 0.15s;
+  overflow: hidden; word-break: break-word;
+}
+.signal-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.signal-card .signal-icon { font-size: 22px; }
+.signal-card .signal-name { font-size: 12px; font-weight: 700; color: var(--navy); }
+.signal-card .signal-desc { font-size: 11px; color: var(--slate); }
+.signal-card .signal-lever {
+  margin-top: 6px; padding: 4px 8px; border-radius: 6px;
+  font-size: 10px; font-weight: 600; background: var(--lblue); color: var(--navy);
+  display: inline-block;
+}
+.signal-card .signal-outcome {
+  font-size: 10px; color: var(--green); font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ── CAPABILITY PILLS ──────────────────────────── */
+.cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+/* Center orphan card when 7th item is alone in its row */
+.cap-grid .cap-card:last-child:nth-child(3n+1) { grid-column: 2 / 3; }
+.cap-card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1.5px solid var(--border); padding: 18px 20px;
+  display: flex; gap: 14px; align-items: flex-start;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.cap-desc { font-size: 11.5px; color: var(--slate); line-height: 1.55; word-break: break-word; overflow: hidden; }
+.cap-card.to-build { border-color: #FBD38D; background: var(--lorange); }
+.cap-left { flex-shrink: 0; }
+.cap-icon { font-size: 24px; }
+.cap-content { flex: 1; }
+.cap-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+.cap-card.to-build .cap-title { color: var(--orange); }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; margin-bottom: 6px;
+}
+.status-badge.built    { background: var(--lgreen);  color: var(--green);  }
+.status-badge.building { background: var(--lamber);  color: var(--amber);  }
+.status-badge.planned  { background: #E0F2FE; color: #0369A1; }
+.status-badge.needed   { background: var(--lorange); color: var(--orange); }
+
+/* ── ROADMAP ───────────────────────────────────── */
+.roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; }
+.roadmap::before {
+  content: ''; position: absolute;
+  top: 32px; left: calc(100%/6); right: calc(100%/6);
+  height: 3px;
+  background: linear-gradient(to right, var(--blue), var(--orange));
+  border-radius: 2px;
+}
+.phase-card {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 20px; text-align: center;
+}
+.phase-circle {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; color: #fff;
+  position: relative; z-index: 1; margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.phase-circle.p1 { background: var(--blue); }
+.phase-circle.p2 { background: linear-gradient(135deg, var(--blue), var(--orange)); }
+.phase-circle.p3 { background: var(--orange); }
+.phase-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.phase-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+.phase-body {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  box-shadow: var(--shadow); width: 100%;
+}
+.phase-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 11.5px; color: var(--slate); line-height: 1.5; }
+.phase-item:last-child { margin-bottom: 0; }
+.phase-item::before { content: '✓'; color: var(--blue); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.phase-card.p3 .phase-item::before { color: var(--orange); }
+
+/* ── OUTCOMES ──────────────────────────────────── */
+.outcome-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.outcome-card {
+  border-radius: var(--radius); padding: 22px 18px;
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow: var(--shadow);
+}
+.outcome-card.green  { background: var(--lgreen);  border: 1.5px solid #86EFAC; }
+.outcome-card.blue   { background: #DBEAFE;         border: 1.5px solid #93C5FD; }
+.outcome-card.amber  { background: var(--lamber);  border: 1.5px solid #FCD34D; }
+.outcome-card.purple { background: var(--lpurple); border: 1.5px solid #C4B5FD; }
+.outcome-icon { font-size: 26px; }
+.outcome-title { font-size: 14px; font-weight: 700; }
+.outcome-card.green  .outcome-title { color: #15803D; }
+.outcome-card.blue   .outcome-title { color: #1D4ED8; }
+.outcome-card.amber  .outcome-title { color: #B45309; }
+.outcome-card.purple .outcome-title { color: #6D28D9; }
+.outcome-points { list-style: none; }
+.outcome-points li { font-size: 11.5px; color: var(--slate); padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; }
+.outcome-points li::before { content: '→'; font-weight: 700; flex-shrink: 0; margin-top: 0; }
+.outcome-card.green  .outcome-points li::before { color: var(--green); }
+.outcome-card.blue   .outcome-points li::before { color: #2563EB; }
+.outcome-card.amber  .outcome-points li::before { color: var(--amber); }
+.outcome-card.purple .outcome-points li::before { color: var(--purple); }
+
+/* ── SIDEBAR COLLAPSIBLE ───────────────────────── */
+/* NOTE: do NOT override position here — sidebar must stay fixed */
+.sidebar { transition: width 0.25s ease; }
+.main    { transition: margin-left 0.25s ease; }
+.main.sidebar-collapsed { margin-left: 60px; }
+.sidebar.collapsed { width: 60px; }
+
+/* Toggle button — fixed so it's never clipped by sidebar overflow-y */
+.sidebar-toggle {
+  position: fixed; left: 207px; top: 72px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  border: 2px solid #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; z-index: 300;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: left 0.25s ease, background 0.15s;
+}
+.sidebar-toggle:hover { background: var(--navy); }
+.sidebar-toggle.nav-collapsed { left: 47px; }
+
+/* Collapsed: hide all text, show only icons */
+.sidebar.collapsed .sidebar-logo .brand,
+.sidebar.collapsed .sidebar-logo .sub,
+.sidebar.collapsed .sidebar-logo .badge,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .sidebar-footer { display: none; }
+
+.sidebar.collapsed .nav a {
+  padding: 10px;
+  justify-content: center;
+  font-size: 0;
+  gap: 0;
+}
+.sidebar.collapsed .nav a .icon {
+  font-size: 16px;
+  width: auto;
+}
+.sidebar.collapsed .sidebar-logo {
+  padding: 20px 10px 14px;
+  display: flex; justify-content: center;
+}
+
+/* ── PRINT ─────────────────────────────────────── */
+@media print {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  section { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- Toggle button — outside sidebar so it's never clipped by overflow -->
+<button class="sidebar-toggle" id="sidebar-toggle" title="Collapse navigation">◀</button>
+
+<!-- ══ SIDEBAR ═══════════════════════════════════════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">FLICKPOINT AGENT</div>
+    <div class="sub">FieldAssist · CPG-OS</div>
+    <div class="badge">HLD Brief · May 2026</div>
+  </div>
+  <div class="nav">
+    <div class="nav-label">Document</div>
+    <a href="#problem"  class="active"><span class="icon">🎯</span>The Problem</a>
+    <a href="#arch">    <span class="icon">🏗</span>Architecture</a>
+    <a href="#flow">    <span class="icon">⚡</span>Agent Flow</a>
+    <a href="#signals"> <span class="icon">📡</span>What It Solves</a>
+    <a href="#engine">  <span class="icon">⚙️</span>Loyalty Engine</a>
+    <a href="#build">   <span class="icon">🔧</span>What To Build</a>
+    <a href="#roadmap"> <span class="icon">🗺</span>Roadmap</a>
+    <a href="#outcomes"><span class="icon">🏆</span>Outcomes</a>
+  </div>
+  <div class="sidebar-footer">Owner: Ambuj Hatwal<br/>Confidential · Internal</div>
+</nav>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">⚡ CPG-OS Action Layer · Loyalty Module</div>
+  <h1>Flickpoint <span>Agent</span></h1>
+  <p>Flickpoint operates in <strong style="color:#fff">two modes</strong>. <span style="color:#BDD7EE">⚡ CPG-OS Mode —</span> receives a leakage signal from CPG-OS and executes a loyalty intervention. <span style="color:#86EFAC">🔍 Standalone Mode —</span> the agent itself scans full company data — Sales, Orders, Visits, SKU portfolio, Distributor coverage, Schemes — detects the gap independently, then solves it using the Loyalty Engine. No CPG-OS dependency required.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span class="label">Role</span><span class="value">Sub-Agent · Standalone (Self-Detect)</span></div>
+    <div class="hero-meta-item"><span class="label">Scope</span><span class="value">Outlets &amp; Distributors</span></div>
+    <div class="hero-meta-item"><span class="label">Agent Tier</span><span class="value">M (Medium)</span></div>
+    <div class="hero-meta-item"><span class="label">Surfaces</span><span class="value">CLI · API · MCP · UI</span></div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-pill"><span class="n">7</span><span class="l">Leakage types<br/>addressed</span></div>
+    <div class="stat-pill"><span class="n">5</span><span class="l">Agent steps<br/>to intervene</span></div>
+    <div class="stat-pill"><span class="n">3</span><span class="l">Maturity<br/>phases</span></div>
+    <div class="stat-pill"><span class="n">4</span><span class="l">Business<br/>outcomes</span></div>
+  </div>
+</div>
+
+<!-- ══ 1. THE PROBLEM ════════════════════════════════════════════ -->
+<section id="problem">
+  <div class="section-header">
+    <div class="section-tag">The Problem</div>
+    <h2>Detection without action = lost revenue<br/><span class="sub">CPG-OS is good at sensing gaps. What's missing is the act layer.</span></h2>
+  </div>
+
+  <div class="problem-compare">
+    <div class="prob-box before">
+      <h3>❌ Today — Manual &amp; Slow</h3>
+      <div class="prob-step"><div class="dot">1</div><div class="txt">CPG-OS fires a signal: outlet churn in North Zone</div></div>
+      <div class="prob-step"><div class="dot">2</div><div class="txt">Human reads dashboard, opens a ticket</div></div>
+      <div class="prob-step"><div class="dot">3</div><div class="txt">PM manually configures a campaign (days later)</div></div>
+      <div class="prob-step"><div class="dot">4</div><div class="txt">Campaign goes live — window already lost</div></div>
+      <div class="prob-step"><div class="dot">5</div><div class="txt">No feedback loop — did it even work?</div></div>
+    </div>
+    <div class="arrow-mid">→</div>
+    <div class="prob-box after">
+      <h3>✅ With Flickpoint Agent — Automated</h3>
+      <div class="prob-step"><div class="dot">1</div><div class="txt">CPG-OS fires signal → Agent receives in real-time</div></div>
+      <div class="prob-step"><div class="dot">2</div><div class="txt">Agent validates, finds root cause, scores outlets</div></div>
+      <div class="prob-step"><div class="dot">3</div><div class="txt">Designs campaign with budget + ROI projection</div></div>
+      <div class="prob-step"><div class="dot">4</div><div class="txt">Creates campaign automatically (or 1-click approval)</div></div>
+      <div class="prob-step"><div class="dot">5</div><div class="txt">Monitors outcome, reports back to CPG-OS</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2. ARCHITECTURE ════════════════════════════════════════════ -->
+<section id="arch">
+  <div class="section-header">
+    <div class="section-tag">Architecture</div>
+    <h2>System Architecture — Two Modes<br/><span class="sub">⚡ CPG-OS Mode: master agent detects leakage → triggers Flickpoint to act. &nbsp;|&nbsp; 🔍 Standalone Mode: Flickpoint self-scans Sales · Visits · Orders · SKU · Distributor · Schemes to detect gaps independently, then solves them via loyalty — no CPG-OS needed.</span></h2>
+  </div>
+  <div class="arch-wrap">
+    <svg class="arch-diagram" viewBox="0 0 1000 432" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Arial,sans-serif">
+      <defs>
+        <marker id="a1" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto"><polygon points="0 0,8 3.5,0 7" fill="#2E75B6"/></marker>
+        <marker id="a2" markerWidth="8" markerHeight="7" refX="1" refY="3.5" orient="auto"><polygon points="8 0,0 3.5,8 7" fill="#94A3B8"/></marker>
+        <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0000001A"/></filter>
+      </defs>
+
+      <!-- CPG-OS -->
+      <rect x="10" y="30" width="190" height="300" rx="10" fill="#1F4E79" filter="url(#s)"/>
+      <rect x="10" y="30" width="190" height="40" rx="10" fill="#163960"/>
+      <rect x="10" y="58" width="190" height="12" fill="#163960"/>
+      <text x="105" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">CPG-OS</text>
+      <text x="105" y="62" text-anchor="middle" font-size="9.5" fill="#7FB3D3">Master Agent · Sense Layer</text>
+      <text x="105" y="91" text-anchor="middle" font-size="8.5" fill="#5A90BB" font-weight="600">DETECTS LEAKAGE →</text>
+      <text x="105" y="102" text-anchor="middle" font-size="8.5" fill="#5A90BB" font-weight="600">TRIGGERS SUB-AGENTS</text>
+      <rect x="24" y="104" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="121" text-anchor="middle" font-size="11" fill="#CFE2F3">📉 Outlet Churn</text>
+      <rect x="24" y="136" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="153" text-anchor="middle" font-size="11" fill="#CFE2F3">📦 Volume Drop</text>
+      <rect x="24" y="168" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="185" text-anchor="middle" font-size="11" fill="#CFE2F3">🛒 SKU Gap</text>
+      <rect x="24" y="200" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="217" text-anchor="middle" font-size="11" fill="#CFE2F3">🏷 Scheme Leak</text>
+      <rect x="24" y="232" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="249" text-anchor="middle" font-size="11" fill="#CFE2F3">🆕 New Outlet</text>
+      <rect x="24" y="264" width="162" height="26" rx="5" fill="#254D72"/><text x="105" y="281" text-anchor="middle" font-size="11" fill="#CFE2F3">⚔️ Competitor</text>
+      <rect x="24" y="296" width="162" height="26" rx="5" fill="#1A3A5C" stroke="#2E75B6" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="105" y="313" text-anchor="middle" font-size="10" fill="#5A90BB">+ more signals</text>
+
+      <!-- Arrow: CPG-OS → Agent (label sits above the line, not on it) -->
+      <rect x="201" y="158" width="62" height="16" rx="4" fill="#2E75B6"/>
+      <text x="232" y="170" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">Triggers Agent</text>
+      <line x1="202" y1="180" x2="262" y2="180" stroke="#2E75B6" stroke-width="2.5" marker-end="url(#a1)"/>
+
+      <!-- Agent -->
+      <rect x="264" y="30" width="418" height="300" rx="10" fill="#fff" stroke="#2E75B6" stroke-width="2" filter="url(#s)"/>
+      <rect x="264" y="30" width="418" height="44" rx="10" fill="#2E75B6"/>
+      <rect x="264" y="58" width="418" height="16" fill="#2E75B6"/>
+      <text x="473" y="50" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">FLICKPOINT AGENT</text>
+      <text x="473" y="63" text-anchor="middle" font-size="9.5" fill="#BDD7EE">⚡ CPG-OS Mode: Triggered by signal  ·  🔍 Standalone: Self-detects from Company Data</text>
+
+      <!-- Steps -->
+      <rect x="278" y="88" width="390" height="36" rx="6" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1"/>
+      <circle cx="302" cy="106" r="12" fill="#1F4E79"/>
+      <text x="302" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">1</text>
+      <text x="324" y="101" font-size="11" font-weight="700" fill="#1F4E79">Receive Signal  OR  Self-Scan</text>
+      <text x="324" y="112" font-size="9" fill="#2563EB" font-weight="600">⚡ CPG-OS trigger</text>
+      <text x="420" y="112" font-size="9" fill="#64748B">·  OR  ·</text>
+      <text x="456" y="112" font-size="9" fill="#16A34A" font-weight="600">🔍 Scan: Sales/Visits/SKU/Orders/Distributor</text>
+
+      <rect x="278" y="130" width="390" height="36" rx="6" fill="#EFF6FF"/>
+      <circle cx="302" cy="148" r="12" fill="#1F4E79"/>
+      <text x="302" y="153" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">2</text>
+      <text x="324" y="144" font-size="11" font-weight="700" fill="#1F4E79">Validate from Data</text>
+      <text x="324" y="158" font-size="9.5" fill="#64748B">Query ClickHouse — is the leakage real &amp; statistically significant?</text>
+
+      <rect x="278" y="172" width="390" height="36" rx="6" fill="#EFF6FF"/>
+      <circle cx="302" cy="190" r="12" fill="#1F4E79"/>
+      <text x="302" y="195" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">3</text>
+      <text x="324" y="186" font-size="11" font-weight="700" fill="#1F4E79">Root Cause Analysis</text>
+      <text x="324" y="200" font-size="9.5" fill="#64748B">Seasonal? Geo-specific? Tier at risk? Scheme expired?</text>
+
+      <rect x="278" y="214" width="390" height="36" rx="6" fill="#EFF6FF"/>
+      <circle cx="302" cy="232" r="12" fill="#1F4E79"/>
+      <text x="302" y="237" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">4</text>
+      <text x="324" y="228" font-size="11" font-weight="700" fill="#1F4E79">Target &amp; Score Outlets</text>
+      <text x="324" y="242" font-size="9.5" fill="#64748B">Geo heatmap · Propensity scoring · Budget allocation</text>
+
+      <rect x="278" y="256" width="390" height="42" rx="6" fill="#FFF0E6" stroke="#E05C1A" stroke-width="1.5"/>
+      <circle cx="302" cy="277" r="12" fill="#E05C1A"/>
+      <text x="302" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">5</text>
+      <text x="324" y="272" font-size="11" font-weight="700" fill="#E05C1A">Design + Execute Intervention</text>
+      <text x="324" y="286" font-size="9.5" fill="#7C4A1A">Create campaign via API · Set budget · Project ROI · Auto-execute or Approve</text>
+
+      <!-- Standalone data sources row -->
+      <rect x="278" y="303" width="390" height="22" rx="5" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1"/>
+      <text x="290" y="314" font-size="8.5" font-weight="700" fill="#15803D">🔍 Standalone reads:</text>
+      <text x="380" y="314" font-size="8.5" fill="#475569">Sales · Visits · SKU · Orders · Distributor · Schemes (ClickHouse)</text>
+
+      <!-- Arrow: Agent → Loyalty (label sits above the line) -->
+      <rect x="689" y="158" width="50" height="16" rx="4" fill="#2E75B6"/>
+      <text x="714" y="170" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">Action</text>
+      <line x1="684" y1="180" x2="744" y2="180" stroke="#2E75B6" stroke-width="2.5" marker-end="url(#a1)"/>
+
+      <!-- Loyalty -->
+      <rect x="746" y="30" width="244" height="300" rx="10" fill="#fff" stroke="#1F4E79" stroke-width="1.5" filter="url(#s)"/>
+      <rect x="746" y="30" width="244" height="40" rx="10" fill="#1F4E79"/>
+      <rect x="746" y="56" width="244" height="14" fill="#1F4E79"/>
+      <text x="868" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">LOYALTY ENGINE</text>
+      <text x="868" y="65" text-anchor="middle" font-size="10" fill="#7FB3D3">Flickpoint Module</text>
+
+      <rect x="758" y="80" width="220" height="48" rx="6" fill="#EFF6FF" stroke="#BDD7EE" stroke-width="1"/>
+      <text x="868" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">Reward Engine</text>
+      <text x="868" y="109" text-anchor="middle" font-size="9" fill="#475569">Daily txn · Monthly targets</text>
+      <text x="868" y="121" text-anchor="middle" font-size="9" fill="#475569">Tier multiplier · By SKU/Category</text>
+
+      <rect x="758" y="134" width="220" height="44" rx="6" fill="#EFF6FF" stroke="#BDD7EE" stroke-width="1"/>
+      <text x="868" y="150" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">Tier Engine</text>
+      <text x="868" y="163" text-anchor="middle" font-size="9" fill="#475569">Silver · Gold · Platinum</text>
+      <text x="868" y="175" text-anchor="middle" font-size="9" fill="#475569">Downgrade shield (3 types)</text>
+
+      <rect x="758" y="184" width="220" height="44" rx="6" fill="#EFF6FF" stroke="#BDD7EE" stroke-width="1"/>
+      <text x="868" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">Approval + CN Conversion</text>
+      <text x="868" y="213" text-anchor="middle" font-size="9" fill="#475569">Multi-stage approval gate</text>
+      <text x="868" y="225" text-anchor="middle" font-size="9" fill="#475569">Points → Credit Note → DMS</text>
+
+      <rect x="758" y="234" width="220" height="38" rx="6" fill="#EFF6FF" stroke="#BDD7EE" stroke-width="1"/>
+      <text x="868" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">GT Onboarding</text>
+      <text x="868" y="263" text-anchor="middle" font-size="9" fill="#475569">Register · KYC · Enroll via field</text>
+
+      <rect x="758" y="278" width="220" height="42" rx="6" fill="#FFF0E6" stroke="#E05C1A" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="868" y="294" text-anchor="middle" font-size="10" font-weight="700" fill="#E05C1A">🔧 To Build for Agent</text>
+      <text x="868" y="307" text-anchor="middle" font-size="9" fill="#7C4A1A">Campaign API · Cohort API · ROI Model</text>
+      <text x="868" y="319" text-anchor="middle" font-size="9" fill="#7C4A1A">MCP Surface · Feedback Loop</text>
+
+      <!-- Surfaces -->
+      <text x="473" y="358" text-anchor="middle" font-size="10" fill="#64748B" font-weight="600">AGENT SURFACES (FieldAssist Vibe Coding Mandate)</text>
+      <rect x="294" y="364" width="82" height="30" rx="7" fill="#fff" stroke="#2E75B6" stroke-width="1.5"/>
+      <text x="335" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">CLI</text>
+      <text x="335" y="388" text-anchor="middle" font-size="9" fill="#64748B">Ops scripts</text>
+      <rect x="390" y="364" width="82" height="30" rx="7" fill="#fff" stroke="#2E75B6" stroke-width="1.5"/>
+      <text x="431" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">REST API</text>
+      <text x="431" y="388" text-anchor="middle" font-size="9" fill="#64748B">CPG-OS calls</text>
+      <rect x="486" y="364" width="82" height="30" rx="7" fill="#fff" stroke="#2E75B6" stroke-width="1.5"/>
+      <text x="527" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">MCP</text>
+      <text x="527" y="388" text-anchor="middle" font-size="9" fill="#64748B">LLM driven</text>
+      <rect x="582" y="364" width="82" height="30" rx="7" fill="#fff" stroke="#2E75B6" stroke-width="1.5"/>
+      <text x="623" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="#1F4E79">UI</text>
+      <text x="623" y="388" text-anchor="middle" font-size="9" fill="#64748B">Human review</text>
+
+      <!-- Feedback loop -->
+      <path d="M473 336 Q473 406 200 406 Q130 406 105 312" stroke="#94A3B8" stroke-width="1.8" fill="none" stroke-dasharray="5,3" marker-end="url(#a2)"/>
+      <rect x="240" y="396" width="200" height="16" rx="4" fill="#F1F5F9"/>
+      <text x="340" y="408" text-anchor="middle" font-size="9" fill="#64748B">Feedback loop — did the leakage close?</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══ 3. AGENT FLOW ══════════════════════════════════════════════ -->
+<section id="flow">
+  <div class="section-header">
+    <div class="section-tag orange">Agent Flow</div>
+    <h2>5 Steps — CPG-OS Triggered or Self-Initiated Scan<br/><span class="sub">Steps 2–5 are identical in both modes. Only the trigger differs — CPG-OS signal, or the agent's own company data scan.</span></h2>
+  </div>
+  <div class="stepper">
+    <div class="step-item">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <div class="step-title">Signal or Self-Scan</div>
+        <div class="step-desc"><strong style="color:#2563EB">⚡ CPG-OS</strong> sends leakage signal · <strong style="color:#16A34A">OR</strong> · agent scans Sales, Visits, SKU, Orders, Distributor data independently</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <div class="step-title">Validate from Data</div>
+        <div class="step-desc">Query ClickHouse — is the leakage real? Statistically significant?</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <div class="step-title">Root Cause Analysis</div>
+        <div class="step-desc">Seasonal? Geography-specific? Tier at risk? Scheme expired? Competitor?</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-circle">4</div>
+      <div class="step-body">
+        <div class="step-title">Target &amp; Score</div>
+        <div class="step-desc">Geo heatmap, outlet propensity scoring, smart budget allocation</div>
+      </div>
+    </div>
+    <div class="step-item highlight">
+      <div class="step-circle">5</div>
+      <div class="step-body">
+        <div class="step-title">Execute Intervention</div>
+        <div class="step-desc">Create campaign via API with budget + ROI projection. Auto-execute or 1-click approve</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. WHAT IT SOLVES ══════════════════════════════════════════ -->
+<section id="signals">
+  <div class="section-header">
+    <div class="section-tag green">Problem Statements</div>
+    <h2>What Flickpoint Agent Solves — 7 Leakage Types<br/><span class="sub">Each signal from CPG-OS maps to a specific loyalty intervention and outcome</span></h2>
+  </div>
+  <div class="signal-grid">
+
+    <div class="signal-card">
+      <div class="signal-icon">📉</div>
+      <div class="signal-name">Outlet Churn</div>
+      <div class="signal-desc">Outlet hasn't ordered in 30+ days. Slipping away silently.</div>
+      <div class="signal-lever">Reactivation Campaign</div>
+      <div class="signal-outcome">✓ Order placed within 30 days</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">📦</div>
+      <div class="signal-name">Volume / Basket Drop</div>
+      <div class="signal-desc">Outlet's order value dropped 20%+ over 6 weeks.</div>
+      <div class="signal-lever">Monthly Target + Slab Rewards</div>
+      <div class="signal-outcome">✓ Basket size hits reward threshold</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">🛒</div>
+      <div class="signal-name">SKU Portfolio Gap</div>
+      <div class="signal-desc">Outlet buying only 2–3 SKUs from a 12-SKU portfolio.</div>
+      <div class="signal-lever">Category-Specific Campaign</div>
+      <div class="signal-outcome">✓ Cross-sell unlocked</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">🏷</div>
+      <div class="signal-name">Scheme Underutilized</div>
+      <div class="signal-desc">Trade scheme running. Redemption at only 20%.</div>
+      <div class="signal-lever">Loyalty Booster on Scheme SKUs</div>
+      <div class="signal-outcome">✓ Scheme redemption recovers</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">🆕</div>
+      <div class="signal-name">New Outlet Inactive</div>
+      <div class="signal-desc">Onboarded 45 days ago. No second order placed yet.</div>
+      <div class="signal-lever">GT Enrollment + Welcome Campaign</div>
+      <div class="signal-outcome">✓ Second order triggered</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">🏪</div>
+      <div class="signal-name">Distributor Slipping</div>
+      <div class="signal-desc">Coverage dropping. Secondary sales not moving.</div>
+      <div class="signal-lever">Distributor Coverage Program</div>
+      <div class="signal-outcome">✓ Coverage targets met</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-icon">⚔️</div>
+      <div class="signal-name">Competitive Threat</div>
+      <div class="signal-desc">Rival brand gaining shelf share in key outlets.</div>
+      <div class="signal-lever">Tier Stickiness + Multiplier</div>
+      <div class="signal-outcome">✓ Outlet locked in via Gold/Platinum</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ 5. LOYALTY ENGINE ══════════════════════════════════════════ -->
+<section id="engine">
+  <div class="section-header">
+    <div class="section-tag">Loyalty Engine</div>
+    <h2>The Foundation the Agent Runs On<br/><span class="sub">What's already built, building, or planned in the Flickpoint module</span></h2>
+  </div>
+  <div class="cap-grid">
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">🏆</div></div>
+      <div class="cap-content">
+        <div class="status-badge built">✓ Done</div>
+        <div class="cap-title">Reward Generation Engine</div>
+        <div class="cap-desc">Daily transactional rewards (per invoice), monthly target-based rewards, and tier multipliers — all configurable by SKU, category, or product hierarchy. Dual ClickHouse + SQL ledger with full audit trail.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">🎖</div></div>
+      <div class="cap-content">
+        <div class="status-badge built">✓ Done</div>
+        <div class="cap-title">Tier Engine</div>
+        <div class="cap-desc">Silver / Gold / Platinum tiers with 3 types of downgrade shields (Grace Period, Exhaustible, Cyclical). Creates real switching costs — outlets don't risk losing a hard-earned tier.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">✅</div></div>
+      <div class="cap-content">
+        <div class="status-badge building">⚙ Building</div>
+        <div class="cap-title">Approval + CN Conversion</div>
+        <div class="cap-desc">Multi-stage approval gate before points hit wallet. Approved points auto-convert to Credit Notes (Points × Conversion Factor) and flow to DMS for invoice settlement. Loyalty has direct financial impact.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">📱</div></div>
+      <div class="cap-content">
+        <div class="status-badge planned">✏ Scoped · Designing</div>
+        <div class="cap-title">GT Onboarding Flow</div>
+        <div class="cap-desc">GT sales user registers outlet, completes KYC, and enrolls in campaigns from the field app. The agent's decisions surface here as actionable CTAs on the call prep screen.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">📊</div></div>
+      <div class="cap-content">
+        <div class="status-badge built">✓ Done</div>
+        <div class="cap-title">Retailer App</div>
+        <div class="cap-desc">Outlet-facing app showing wallet balance, active campaigns, targets, live achievement, slab position, points in process, and CN tracking. The agent's campaign interventions surface here for outlet visibility.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">⚙️</div></div>
+      <div class="cap-content">
+        <div class="status-badge planned">📋 Scoped</div>
+        <div class="cap-title">Admin Screens</div>
+        <div class="cap-desc">Admin dashboard for rule builder, cohort config, tier setup, approval config, and reward master. Agent will call the underlying APIs directly; humans manage configuration here.</div>
+      </div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-left"><div class="cap-icon">🗄</div></div>
+      <div class="cap-content">
+        <div class="status-badge built">✓ Done</div>
+        <div class="cap-title">Dual Ledger Architecture</div>
+        <div class="cap-desc">ClickHouse for daily reward entries and monthly summaries (OLAP, append-only). Azure SQL for financial wallet (immutable ledger). Agent queries ClickHouse to validate signals and measure outcomes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 6. WHAT TO BUILD ═══════════════════════════════════════════ -->
+<section id="build">
+  <div class="section-header">
+    <div class="section-tag orange">Agent Layer — To Build</div>
+    <h2>What Needs to Be Built for the Agent to Work<br/><span class="sub">The loyalty engine handles calculation. The agent layer handles intelligence and action.</span></h2>
+  </div>
+  <div class="cap-grid">
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">🔌</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Priority</div>
+        <div class="cap-title">Campaign Creation API</div>
+        <div class="cap-desc">Campaigns are configured manually today. The agent needs to programmatically create rules, criteria, and slabs targeting a specific outlet cohort — fully via API. This is the single most critical capability for the agent.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">👥</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Priority</div>
+        <div class="cap-title">Dynamic Cohort API</div>
+        <div class="cap-desc">Agent needs to define target groups from computed logic — "lapsed outlets in Delhi, Gold tier, volume drop &gt;20%" — and attach that cohort to a campaign. Cohort 2.0 architecture supports this; needs agent-callable exposure.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">📡</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Required</div>
+        <div class="cap-title">MCP Surface (agent.run)</div>
+        <div class="cap-desc">Following the FieldAssist vibe coding mandate — CLI + API + UI + MCP from day one. CPG-OS calls agent.run, agent.get_run, agent.describe over the normalized contract. Zero custom integration per orchestrator.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">📈</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Required</div>
+        <div class="cap-title">ROI Modeling Layer</div>
+        <div class="cap-desc">Agent shouldn't launch campaigns blind. Phase 1: industry benchmark lift rates. Phase 2: actual historical data from Flickpoint campaigns. The model self-improves as campaigns accumulate data.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">🔁</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Required</div>
+        <div class="cap-title">Feedback Loop to CPG-OS</div>
+        <div class="cap-desc">After intervention, agent monitors leakage metrics for 30/60/90 days and reports back: did churn stop? Volume recover? This closes the loop and makes the whole CPG-OS system smarter with each run.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">📋</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Required</div>
+        <div class="cap-title">Agent Manifest + Read APIs</div>
+        <div class="cap-desc">Agent publishes /.well-known/agent.json declaring capacity, actions, and SLOs. Read APIs expose loyalty state (outlet tier, balance, campaign progress) for validation and monitoring steps.</div>
+      </div>
+    </div>
+    <div class="cap-card to-build">
+      <div class="cap-left"><div class="cap-icon">🗃️</div></div>
+      <div class="cap-content">
+        <div class="status-badge needed">! Standalone Mode</div>
+        <div class="cap-title">Company Data Read Layer</div>
+        <div class="cap-desc">Standalone detection requires direct ClickHouse access across all business data — Sales orders, Visit records, SKU portfolio gaps, Distributor coverage, Scheme redemption. This is the agent's independent sense layer: it reads company data, surfaces the gap, then acts via loyalty. Without this, standalone mode cannot function.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. ROADMAP ═════════════════════════════════════════════════ -->
+<section id="roadmap">
+  <div class="section-header">
+    <div class="section-tag purple">Maturity Roadmap</div>
+    <h2>3-Phase Agent Maturity Plan<br/><span class="sub">Start with insight. Build to semi-automation. Evolve to full autonomy.</span></h2>
+  </div>
+  <div class="roadmap">
+    <div class="phase-card">
+      <div class="phase-circle p1">P1</div>
+      <div class="phase-label">0 – 3 Months</div>
+      <div class="phase-title">Read + Recommend</div>
+      <div class="phase-body">
+        <div class="phase-item">Validates CPG-OS signals against loyalty data</div>
+        <div class="phase-item">Reads outlet tier, points, campaign status</div>
+        <div class="phase-item">Recommends intervention with full parameters</div>
+        <div class="phase-item">Human configures &amp; launches campaign</div>
+        <div class="phase-item">Agent tracks if leakage closes post-launch</div>
+      </div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-circle p2">P2</div>
+      <div class="phase-label">3 – 6 Months</div>
+      <div class="phase-title">Read + Semi-Execute</div>
+      <div class="phase-body">
+        <div class="phase-item">Campaign Creation API live</div>
+        <div class="phase-item">Dynamic Cohort API exposed</div>
+        <div class="phase-item">Agent proposes full campaign spec with ROI</div>
+        <div class="phase-item">Human reviews → 1-click approval</div>
+        <div class="phase-item">Agent creates campaign automatically</div>
+      </div>
+    </div>
+    <div class="phase-card p3">
+      <div class="phase-circle p3">P3</div>
+      <div class="phase-label">6 – 12 Months</div>
+      <div class="phase-title">Autonomous + Learning</div>
+      <div class="phase-body">
+        <div class="phase-item">ROI model data-driven (real campaign history)</div>
+        <div class="phase-item">Low-risk actions auto-execute (no approval)</div>
+        <div class="phase-item">Feedback loop live with CPG-OS</div>
+        <div class="phase-item">Budget optimized by historical lift data</div>
+        <div class="phase-item">System gets smarter with each run</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. OUTCOMES ════════════════════════════════════════════════ -->
+<section id="outcomes">
+  <div class="section-header">
+    <div class="section-tag green">Outcomes</div>
+    <h2>What Success Looks Like<br/><span class="sub">Loyalty as a precision GTM engine — not a passive points program</span></h2>
+  </div>
+  <div class="outcome-grid">
+    <div class="outcome-card green">
+      <div class="outcome-icon">💰</div>
+      <div class="outcome-title">Revenue Recovery</div>
+      <ul class="outcome-points">
+        <li>Lapsed outlets reactivated within 30 days</li>
+        <li>Volume targets hit via slab rewards</li>
+        <li>Scheme ROI recovered via loyalty booster</li>
+        <li>SKU cross-sell unlocked via category campaigns</li>
+      </ul>
+    </div>
+    <div class="outcome-card blue">
+      <div class="outcome-icon">🔒</div>
+      <div class="outcome-title">Outlet Retention</div>
+      <ul class="outcome-points">
+        <li>Gold/Platinum tier creates real switching costs</li>
+        <li>Competitive threats neutralized via tier stickiness</li>
+        <li>New outlet onboarding accelerated</li>
+        <li>Churn caught early, before it's too late</li>
+      </ul>
+    </div>
+    <div class="outcome-card amber">
+      <div class="outcome-icon">🚀</div>
+      <div class="outcome-title">GTM / RTM Enablement</div>
+      <ul class="outcome-points">
+        <li>GT sales teams armed with loyalty context on calls</li>
+        <li>Distributor coverage targets met via programs</li>
+        <li>Portfolio breadth improves across the network</li>
+        <li>Loyalty becomes a field sales tool, not just admin</li>
+      </ul>
+    </div>
+    <div class="outcome-card purple">
+      <div class="outcome-icon">🧠</div>
+      <div class="outcome-title">Data-Driven Loyalty</div>
+      <ul class="outcome-points">
+        <li>Every campaign backed by ROI projection</li>
+        <li>Outcome loops back to CPG-OS signal</li>
+        <li>System self-improves with each intervention</li>
+        <li>Zero wasted budget on blanket campaigns</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+// ── Active nav on scroll ──────────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('.nav a');
+const observer  = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.nav a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ── Collapsible sidebar ───────────────────────────
+const sidebar     = document.getElementById('sidebar');
+const mainEl      = document.querySelector('.main');
+const toggleBtn   = document.getElementById('sidebar-toggle');
+toggleBtn.addEventListener('click', () => {
+  const collapsed = sidebar.classList.toggle('collapsed');
+  mainEl.classList.toggle('sidebar-collapsed', collapsed);
+  toggleBtn.classList.toggle('nav-collapsed', collapsed);
+  toggleBtn.textContent = collapsed ? '▶' : '◀';
+  toggleBtn.title = collapsed ? 'Expand navigation' : 'Collapse navigation';
+});
+</script>
+</body>
+</html>
